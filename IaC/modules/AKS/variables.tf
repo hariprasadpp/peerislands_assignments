@@ -56,3 +56,27 @@ variable "vnet_subnet_id" {
   description = "The ID of the subnet where the AKS cluster will be deployed"
   type        = string
 }
+
+variable "service_cidr" {
+  description = "Service CIDR for AKS cluster (must not overlap any VNet subnet)"
+  type        = string
+  default     = "10.1.0.0/16"  
+}
+
+variable "dns_service_ip" {
+  description = "DNS service IP for AKS cluster (must be within service CIDR)"
+  type        = string
+  default     = "10.1.0.10"
+}
+
+variable "docker_bridge_cidr" {
+  description = "Docker bridge network CIDR"
+  type        = string
+  default     = "172.17.0.1/16"
+}
+
+variable "max_pods" {
+  description = "Maximum number of pods per node"
+  type        = number
+  default     = 110
+}
