@@ -1,0 +1,87 @@
+# Terraform files
+*.tfstate
+*.tfstate.*
+*.tfvars
+!terraform.tfvars
+.terraform/
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Local .terraform directories
+**/.terraform/*
+
+# Crash log files
+crash.*.log
+
+# Exclude all .tfvars files, which are likely to contain sensitive data
+*.tfvars.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Ignore any local environment files
+.env
+*.env
+.env.*
+
+# Ignore SSH Keys
+*.pem
+*.key
+id_rsa*
+id_dsa*
+*.ppk
+
+# Azure Service Principal credentials
+azure.*.json
+azureauth.json
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
+
+# Backup files
+*.backup
+*~
+*.bak
+
+# Archive files
+*.zip
+*.tar
+*.gz
+*.rar
+
+# kubeconfig files
+kubeconfig
+*.kubeconfig
+*config.yaml
+
+# Ignore any local development scripts
+*.sh
+*.bat
+*.cmd
+!scripts/*.sh
+!scripts/*.bat
+!scripts/*.cmd
