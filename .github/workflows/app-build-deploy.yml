@@ -2,14 +2,24 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ main, staging, dev ]
+    branches: [ main ]
     paths:
       - 'apps/**'
   pull_request:
-    branches: [ main, staging, dev ]
+    branches: [ main ]
     paths:
       - 'apps/**'
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+        default: 'dev'
 
 jobs:
   build-and-deploy:
@@ -31,12 +41,19 @@ jobs:
           registry: ${{ secrets.ACR_LOGIN_SERVER }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
+      - name: Set Docker Tag
+        id: docker_tag
+        run: |
+          echo "tag=$(date +'%Y%m%d')-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./apps/python-app
           push: true
-          tags: ${{ secrets.ACR_LOGIN_SERVER }}/python-app:latest
+          tags: |
+            ${{ secrets.ACR_LOGIN_SERVER }}/python-app:${{ steps.docker_tag.outputs.tag }}
+            ${{ secrets.ACR_LOGIN_SERVER }}/python-app:latest
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
@@ -60,7 +77,12 @@ jobs:
         run: |
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm repo update
-          helm upgrade --install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
+          helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
+            --version 51.0.0 \
+            --namespace monitoring \
+            --create-namespace \
+            --wait \
+            --timeout 10m
 
       - name: Install Grafana using Helm
         run: |
