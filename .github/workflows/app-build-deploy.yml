@@ -68,11 +68,12 @@ jobs:
         with:
           version: 'latest'
       
-      - name: Deploy to AKS using Helm
+      - name: Deploy to App using Helm
         run: |
           cd apps/helm
-          chmod +x ./install.sh
-          ./install.sh
+          kubectl create namespace app --dry-run=client -o yaml | kubectl apply -f -
+          helm upgrade --install -n app python-app ./chart -f values/${{ github.event.inputs.environment }}.yaml
+          kubectl rollout restart deployment python-app -n app
 
       - name: Install Prometheus using Helm
         run: |
