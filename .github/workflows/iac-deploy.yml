@@ -21,7 +21,10 @@ on:
           - staging
           - prod
         default: 'dev'
-
+permissions:
+  contents: read
+  security-events: write
+  
 jobs:
   security-scan:
     name: Security Scan
