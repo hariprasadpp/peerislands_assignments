@@ -3,13 +3,11 @@ name: Deploy IaC with Terraform
 on:
   push:
     branches: 
-      - main    # Production
-      - staging # Staging
-      - dev     # Development
+      - main     
     paths:
       - 'IaC/**'
   pull_request:
-    branches: [ main, staging, dev ]
+    branches: [ main ]
     paths:
       - 'IaC/**'
   workflow_dispatch:
@@ -25,23 +23,74 @@ on:
         default: 'dev'
 
 jobs:
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install Checkov
+        run: |
+          python -m pip install --upgrade pip
+          pip install checkov
+
+      - name: Run Checkov scan
+        id: checkov
+        run: |
+          checkov --directory IaC \
+            --framework terraform \
+            --output cli \
+            --output sarif \
+            --output-file-path console,results.sarif \
+            --compact \
+            --quiet \
+            --soft-fail
+
+      - name: Upload SARIF file
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
+          category: Checkov
+
+      - name: Check for Critical Issues
+        if: steps.checkov.outcome == 'failure'
+        run: |
+          echo "Critical security issues found in the scan!"
+          echo "Please review the scan results and fix any critical issues."
+          exit 1
+
   plan:
+    needs: security-scan
     name: Terraform Plan
     runs-on: ubuntu-latest
-    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.ref_name == 'main' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
     env:
       TF_WORKSPACE: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.ref_name == 'main' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
-      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
+
+      - name: Cache Terraform
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.terraform.d/plugin-cache
+            .terraform
+          key: ${{ runner.os }}-terraform-${{ hashFiles('IaC/**/*.tf') }}
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -61,15 +110,14 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ./IaC
-        run: |
-          terraform plan -no-color -out=tfplan
+        run: terraform plan -no-color -out=tfplan
 
       - name: Upload Terraform Plan
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: tfplan
           path: IaC/tfplan
-          retention-days: 1
+          retention-days: 5
 
   apply:
     name: Terraform Apply
@@ -79,7 +127,7 @@ jobs:
     environment: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.ref_name == 'main' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
     
     env:
-      TF_WORKSPACE: ${{ github.ref_name == 'main' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+      TF_WORKSPACE: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.ref_name == 'main' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -87,10 +135,18 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
+
+      - name: Cache Terraform
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.terraform.d/plugin-cache
+            .terraform
+          key: ${{ runner.os }}-terraform-${{ hashFiles('IaC/**/*.tf') }}
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -100,7 +156,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Download Terraform Plan
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tfplan
           path: IaC
