@@ -9,7 +9,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: python-app
+      app: {{ include "python-app.name" . }}
   endpoints:
     - port: metrics
       path: {{ .Values.metrics.path }}
