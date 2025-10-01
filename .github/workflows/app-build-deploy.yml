@@ -72,7 +72,7 @@ jobs:
         run: |
           cd apps/helm
           chmod +x ./install.sh
-          ./install.sh ${{ github.event.inputs.environment }}
+          ./install.sh
 
       - name: Install Prometheus using Helm
         run: |
