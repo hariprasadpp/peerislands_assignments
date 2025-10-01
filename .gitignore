@@ -79,7 +79,6 @@ kubeconfig
 *config.yaml
 
 # Ignore any local development scripts
-*.sh
 *.bat
 *.cmd
 !scripts/*.sh
