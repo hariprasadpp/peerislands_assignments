@@ -6,4 +6,9 @@ resource "azurerm_key_vault" "key_vault" {
 	tenant_id           = var.tenant_id
 	sku_name            = var.sku_name
 	tags                = var.tags
+
+	soft_delete_retention_days = 7
+  	purge_protection_enabled   = true
+
+	public_network_access_enabled = false
 }

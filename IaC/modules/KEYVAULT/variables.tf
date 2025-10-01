@@ -1,4 +1,3 @@
-// Define input variables for KEYVAULT module here
 variable "keyvault_name" {
 	description = "Name of the Key Vault"
 	type        = string
