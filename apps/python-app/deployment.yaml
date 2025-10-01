@@ -13,11 +13,11 @@ spec:
       labels:
         app: python-app
     spec:
+      # imagePullSecrets:
+      #   - name: acr-secret
       containers:
       - name: python-app
         image: acrpeerislandprod001.azurecr.io/python-app:latest
-        imagePullSecrets:
-          - name: acr-secret
         ports:
         - containerPort: 5000
 ---
