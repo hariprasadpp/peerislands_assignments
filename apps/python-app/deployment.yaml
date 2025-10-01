@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: python-app
+  namespace: app
 spec:
   replicas: 1
   selector:
@@ -14,7 +15,9 @@ spec:
     spec:
       containers:
       - name: python-app
-        image: <ACR_LOGIN_SERVER>/python-app:latest
+        image: acrpeerislandprod001.azurecr.io/python-app:latest
+        imagePullSecrets:
+          - name: acr-secret
         ports:
         - containerPort: 5000
 ---
@@ -22,8 +25,9 @@ apiVersion: v1
 kind: Service
 metadata:
   name: python-app-service
+  namespace: app
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: python-app
   ports:
