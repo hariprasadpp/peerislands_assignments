@@ -2,7 +2,14 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, staging, dev ]
+    paths:
+      - 'apps/**'
+  pull_request:
+    branches: [ main, staging, dev ]
+    paths:
+      - 'apps/**'
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:

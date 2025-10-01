@@ -6,8 +6,12 @@ on:
       - main    # Production
       - staging # Staging
       - dev     # Development
+    paths:
+      - 'IaC/**'
   pull_request:
     branches: [ main, staging, dev ]
+    paths:
+      - 'IaC/**'
   workflow_dispatch:
     inputs:
       environment:
