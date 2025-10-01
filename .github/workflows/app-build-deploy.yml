@@ -70,6 +70,11 @@ jobs:
         uses: azure/setup-helm@v3
         with:
           version: 'latest'
+      
+      - name: Deploy to AKS using Helm
+        run: |
+          chmod +x ./install.sh
+          ./install.sh ${{ github.event.inputs.environment }}
 
       - name: Install Prometheus using Helm
         run: |

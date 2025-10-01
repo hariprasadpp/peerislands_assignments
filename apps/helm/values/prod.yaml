@@ -1,0 +1,26 @@
+replicaCount: 1
+
+image:
+  repository: acrpeerislandprod001.azurecr.io/python-app
+  tag: latest
+  pullPolicy: IfNotPresent
+  pullSecrets:
+    - name: acr-secret
+
+service:
+  app:
+    type: ClusterIP
+    port: 5000
+  metrics:
+    type: ClusterIP
+    port: 8000
+
+metrics:
+  path: /metrics
+  interval: 15s
+
+namespace: app
+prometheus:
+  enabled: true
+  namespace: monitoring
+  releaseLabel: prometheus
