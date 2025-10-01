@@ -62,10 +62,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
           resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
-      - name: Deploy to AKS
-        run: |
-          kubectl apply -f apps/python-app/deployment.yaml
-
+          
       - name: Install Helm
         uses: azure/setup-helm@v3
         with:
