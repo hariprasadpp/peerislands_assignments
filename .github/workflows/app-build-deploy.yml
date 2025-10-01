@@ -70,7 +70,9 @@ jobs:
       
       - name: Deploy to AKS using Helm
         run: |
+          ls -al
           cd apps/helm
+          ls -al
           chmod +x ./install.sh
           ./install.sh ${{ github.event.inputs.environment }}
 
