@@ -24,6 +24,9 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      DEPLOY_ENV: ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'prod') || (github.ref_name == 'staging' && 'staging') || 'dev' }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -72,7 +75,8 @@ jobs:
         run: |
           cd apps/helm
           kubectl create namespace app --dry-run=client -o yaml | kubectl apply -f -
-          helm upgrade --install -n app python-app ./chart -f values/${{ github.event.inputs.environment }}.yaml
+          echo "Deploying to environment: $DEPLOY_ENV"
+          helm upgrade --install -n app python-app ./chart -f values/${DEPLOY_ENV}.yaml
           kubectl rollout restart deployment python-app -n app
 
       - name: Install Prometheus using Helm
