@@ -74,7 +74,7 @@ jobs:
     name: Terraform Plan
     runs-on: ubuntu-latest
     env:
-      TF_WORKSPACE: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.ref_name == 'main' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+      TF_WORKSPACE: prod
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -130,7 +130,7 @@ jobs:
     environment: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.ref_name == 'main' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
     
     env:
-      TF_WORKSPACE: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.ref_name == 'main' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+      TF_WORKSPACE: prod
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
