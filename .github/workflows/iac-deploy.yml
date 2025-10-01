@@ -105,10 +105,10 @@ jobs:
         working-directory: ./IaC
         run: terraform init
 
-      - name: Select or Create Terraform Workspace
-        working-directory: ./IaC
-        run: |
-          terraform workspace select $TF_WORKSPACE || terraform workspace new $TF_WORKSPACE
+      # - name: Select or Create Terraform Workspace
+      #   working-directory: ./IaC
+      #   run: |
+      #     terraform workspace select $TF_WORKSPACE || terraform workspace new $TF_WORKSPACE
 
       - name: Terraform Plan
         working-directory: ./IaC
@@ -165,9 +165,9 @@ jobs:
         working-directory: ./IaC
         run: terraform init
 
-      - name: Select Terraform Workspace
-        working-directory: ./IaC
-        run: terraform workspace select $TF_WORKSPACE
+      # - name: Select Terraform Workspace
+      #   working-directory: ./IaC
+      #   run: terraform workspace select $TF_WORKSPACE
 
       - name: Terraform Apply
         working-directory: ./IaC
