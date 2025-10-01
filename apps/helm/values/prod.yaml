@@ -1,5 +1,8 @@
 replicaCount: 1
 
+nameOverride: "python-app"
+fullnameOverride: "python-app"
+
 image:
   repository: acrpeerislandprod001.azurecr.io/python-app
   tag: latest
